@@ -100,6 +100,23 @@ describe TurbotRunner::Validator do
       error = TurbotRunner::Validator.validate('primary-data', record, ['number'], seen_uids)
       expect(error).to eq('Already seen record with these identifying fields: {"number"=>123}')
     end
+
+    context 'with schema location passed in' do
+      before do
+        @schema_location = File.join(File.dirname(__FILE__), '..', 'support', 'local_schema.json')
+        @valid_record = {
+          'uid' => '123'
+        }
+        @invalid_record = {
+          'uid' => 123
+        }
+      end
+
+      specify 'should use schema at location for validation' do
+        expect(TurbotRunner::Validator.validate(nil, @valid_record, ['uid'], nil, @schema_location)).to be_nil
+        expect(TurbotRunner::Validator.validate(nil, @invalid_record, ['uid'], nil, @schema_location)).not_to be_nil
+      end
+    end
   end
 
   describe '.identifying_hash' do
